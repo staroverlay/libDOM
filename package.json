@@ -2,7 +2,7 @@
   "name": "@staroverlay/dom",
   "author": "sammwy",
   "description": "DOM API client for build StarOverlay widgets.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",

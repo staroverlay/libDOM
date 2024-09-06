@@ -6,7 +6,7 @@ import { Environment } from './utils/env-utils';
 import EventEmitter from './utils/event-emitter';
 
 export default class StarOverlay extends EventEmitter {
-  private readonly renderTarget: string;
+  private readonly renderTarget: string | undefined;
   private readonly socket: Socket;
   private readonly cdn: string;
 
@@ -20,7 +20,7 @@ export default class StarOverlay extends EventEmitter {
   public env: Environment;
   public html: string;
 
-  constructor(renderTarget: string, socket: Socket, cdn: string) {
+  constructor(renderTarget: string | undefined, socket: Socket, cdn: string) {
     super();
     this.renderTarget = renderTarget;
     this.socket = socket;
@@ -62,12 +62,36 @@ export default class StarOverlay extends EventEmitter {
   }
 
   render() {
-    injectContent(this.renderTarget, this.html);
+    if (this.renderTarget) {
+      injectContent(this.renderTarget, this.html);
+    }
+
     renderIf('if-so-env', window.env.SO_ENV);
     renderIf('if-node-env', window.env.NODE_ENV);
   }
 
   clear() {
-    injectContent(this.renderTarget, '');
+    if (this.renderTarget) {
+      injectContent(this.renderTarget, '');
+    }
+  }
+
+  initWidget(widget: Widget, template: Template, version: TemplateVersion) {
+    this.widget = widget;
+    this.template = template;
+    this.version = version;
+    this.settings = JSON.parse(widget.settings || '{}');
+    this.html = this.version.html;
+
+    if (this.topics.size != 0) {
+      const topics: string[] = [];
+      this.topics.forEach((topic) => {
+        topics.push(topic);
+      });
+      this.socket.emit('subscribe', topics);
+    }
+
+    this.connected = true;
+    this.logC('DOM', 'Logged as widget', widget._id);
   }
 }

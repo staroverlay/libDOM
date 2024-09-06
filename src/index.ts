@@ -10,8 +10,8 @@ export type Event = { data: unknown; topic: string };
 export interface LibDOMSettings {
   backendURL: string;
   workerURL: string;
-  widgetToken: string;
-  renderTarget: string;
+  widgetToken?: string;
+  renderTarget?: string;
 }
 
 export function injectLibDOM({
@@ -33,7 +33,13 @@ export function injectLibDOM({
   // Listen for socket connect event.
   socket.on('connect', () => {
     client.logC('DOM', 'Connected to backend');
-    socket.emit('auth', widgetToken);
+
+    if (widgetToken) {
+      client.logC('DOM', 'Authenticating with token:', widgetToken);
+      socket.emit('auth', widgetToken);
+    } else {
+      client.logC('DOM', 'No token provided, skipping authentication');
+    }
   });
 
   // Listen for socket errors.
@@ -55,26 +61,11 @@ export function injectLibDOM({
       template: Template;
       version: TemplateVersion;
     }) => {
-      client.widget = widget;
-      client.template = template;
-      client.version = version;
-      client.settings = JSON.parse(widget.settings || '{}');
-      client.html = version.html;
+      client.initWidget(widget, template, version);
 
       if (widget.enabled || window.env.SO_ENV === 'preview') {
         client.render();
       }
-
-      if (client.topics.size != 0) {
-        const topics: string[] = [];
-        client.topics.forEach((topic) => {
-          topics.push(topic);
-        });
-        socket.emit('subscribe', topics);
-      }
-
-      client.connected = true;
-      client.logC('DOM', 'Logged as widget', widget._id);
     },
   );
 
