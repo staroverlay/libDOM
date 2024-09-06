@@ -23,7 +23,6 @@ types.js
 # Sources
 *.md
 *.txt
-src
 test
 script
 fixtures
@@ -35,5 +34,3 @@ secrets.ejson
 service.yml
 shipit.yml
 yarn.lock
-
-!dist
