@@ -1,5 +1,5 @@
 import { Template, TemplateVersion, Widget } from '@staroverlay/sdk';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 import StarOverlay from './client';
 import { Environment } from './utils/env-utils';
@@ -14,7 +14,7 @@ export interface LibDOMSettings {
   renderTarget?: string;
 }
 
-export function injectLibDOM({
+function injectLibDOM({
   backendURL,
   workerURL,
   widgetToken,
@@ -23,6 +23,8 @@ export function injectLibDOM({
   // Initialize socket connection.
   const socket = io(backendURL, {
     transports: ['websocket'],
+    autoConnect: true,
+    reconnection: true,
   });
 
   // Initialize Client.StarOverlay
@@ -101,9 +103,12 @@ export function injectLibDOM({
   });
 }
 
+window.injectLibDOM = injectLibDOM;
+
 declare global {
   interface Window {
     StarOverlay: StarOverlay;
     env: Environment;
+    injectLibDOM: typeof injectLibDOM;
   }
 }

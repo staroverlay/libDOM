@@ -1,5 +1,5 @@
 import { Template, TemplateVersion, Widget } from '@staroverlay/sdk';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
 import { injectContent, renderIf } from './utils/dom-utils';
 import { Environment } from './utils/env-utils';
